@@ -1,119 +1,193 @@
-.app {
-  max-width: 800px;
-  margin: 0 auto;
-  padding: 20px;
+*, *::before, *::after {
+  box-sizing: border-box;
 }
 
-h1 {
-  margin-bottom: 4px;
+body {
+  margin: 0;
+  font-family: "Inter", -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+  background: #0f1117;
+  color: #e2e8f0;
+}
+
+.app {
+  max-width: 900px;
+  margin: 0 auto;
+  padding: 32px 20px 60px;
+}
+
+/* ── Header ─────────────────────────────────────────── */
+.app > h1 {
+  font-size: 28px;
+  font-weight: 700;
+  letter-spacing: -0.5px;
+  margin: 0 0 4px;
+  background: linear-gradient(135deg, #6366f1, #8b5cf6);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
 }
 
 .subtitle {
-  margin-bottom: 20px;
-  color: #666;
+  margin: 0 0 32px;
+  color: #6b7280;
+  font-size: 14px;
 }
 
+/* ── Dark scrollbar ──────────────────────────────────── */
+::-webkit-scrollbar { width: 6px; }
+::-webkit-scrollbar-track { background: #0f1117; }
+::-webkit-scrollbar-thumb { background: #2d2f3e; border-radius: 3px; }
+
+/* ── Summary cards ───────────────────────────────────── */
 .summary {
-  display: flex;
-  gap: 12px;
-  margin-bottom: 24px;
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 16px;
+  margin-bottom: 28px;
 }
 
 .summary-card {
-  flex: 1;
-  border: 1px solid #ddd;
-  padding: 14px;
-  background: #fff;
+  background: #1a1d2e;
+  border-radius: 16px;
+  padding: 20px 24px;
+  box-shadow: 0 1px 3px rgba(0,0,0,.3), 0 4px 16px rgba(0,0,0,.2);
+  border: 1px solid #2d2f4a;
+  transition: transform 0.15s ease, box-shadow 0.15s ease;
+}
+
+.summary-card:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 4px 20px rgba(0,0,0,.1);
 }
 
 .summary-card h3 {
-  font-size: 13px;
-  color: #888;
-  margin-bottom: 4px;
+  font-size: 11px;
+  font-weight: 600;
+  letter-spacing: 0.8px;
+  text-transform: uppercase;
+  color: #9ca3af;
+  margin: 0 0 8px;
 }
 
 .income-amount {
-  color: green;
-  font-size: 20px;
-  font-weight: bold;
+  color: #10b981;
+  font-size: 26px;
+  font-weight: 700;
 }
 
 .expense-amount {
-  color: red;
-  font-size: 20px;
-  font-weight: bold;
+  color: #ef4444;
+  font-size: 26px;
+  font-weight: 700;
 }
 
 .balance-amount {
-  font-size: 20px;
-  font-weight: bold;
+  font-size: 26px;
+  font-weight: 700;
+  color: #6366f1;
 }
 
+/* ── Add Transaction card ────────────────────────────── */
 .add-transaction {
-  border: 1px solid #ddd;
-  padding: 16px;
+  background: #1a1d2e;
+  border-radius: 16px;
+  padding: 24px;
   margin-bottom: 24px;
-  background: #fff;
+  box-shadow: 0 1px 3px rgba(0,0,0,.3), 0 4px 16px rgba(0,0,0,.2);
+  border: 1px solid #2d2f4a;
 }
 
 .add-transaction h2 {
-  font-size: 16px;
-  margin-bottom: 12px;
+  font-size: 15px;
+  font-weight: 600;
+  margin: 0 0 16px;
+  color: #c4c9d8;
 }
 
 form {
   display: flex;
-  gap: 8px;
+  gap: 10px;
   flex-wrap: wrap;
 }
 
 form input,
 form select {
-  padding: 8px;
-  border: 1px solid #ccc;
+  padding: 10px 14px;
+  border: 1.5px solid #2d2f4a;
+  border-radius: 10px;
   font-size: 14px;
+  color: #e2e8f0;
+  background: #13152a;
+  outline: none;
+  transition: border-color 0.15s, box-shadow 0.15s;
 }
 
-form input[type="text"] {
-  flex: 2;
+form input::placeholder { color: #4b5280; }
+
+form input:focus,
+form select:focus {
+  border-color: #6366f1;
+  box-shadow: 0 0 0 3px rgba(99,102,241,.18);
+  background: #13152a;
 }
 
-form input[type="number"] {
-  flex: 1;
-}
-
-form select {
-  flex: 1;
-}
+form input[type="text"] { flex: 2; min-width: 160px; }
+form input[type="number"] { flex: 1; min-width: 100px; }
+form select { flex: 1; min-width: 120px; }
 
 form button {
-  padding: 8px 20px;
-  background: #333;
+  padding: 10px 24px;
+  background: linear-gradient(135deg, #6366f1, #8b5cf6);
   color: #fff;
   border: none;
+  border-radius: 10px;
   cursor: pointer;
   font-size: 14px;
+  font-weight: 600;
+  letter-spacing: 0.2px;
+  transition: opacity 0.15s, transform 0.1s;
 }
 
+form button:hover { opacity: 0.92; transform: translateY(-1px); }
+form button:active { transform: translateY(0); opacity: 1; }
+
+/* ── Transactions table card ─────────────────────────── */
 .transactions {
-  margin-bottom: 24px;
+  background: #1a1d2e;
+  border-radius: 16px;
+  padding: 24px;
+  box-shadow: 0 1px 3px rgba(0,0,0,.3), 0 4px 16px rgba(0,0,0,.2);
+  border: 1px solid #2d2f4a;
 }
 
 .transactions h2 {
-  font-size: 16px;
-  margin-bottom: 12px;
+  font-size: 15px;
+  font-weight: 600;
+  margin: 0 0 16px;
+  color: #c4c9d8;
 }
 
 .filters {
   display: flex;
-  gap: 8px;
-  margin-bottom: 12px;
+  gap: 10px;
+  margin-bottom: 16px;
 }
 
 .filters select {
-  padding: 6px;
-  border: 1px solid #ccc;
+  padding: 8px 12px;
+  border: 1.5px solid #2d2f4a;
+  border-radius: 8px;
   font-size: 13px;
+  color: #e2e8f0;
+  background: #13152a;
+  outline: none;
+  transition: border-color 0.15s, box-shadow 0.15s;
+  cursor: pointer;
+}
+
+.filters select:focus {
+  border-color: #6366f1;
+  box-shadow: 0 0 0 3px rgba(99,102,241,.18);
 }
 
 table {
@@ -121,28 +195,55 @@ table {
   border-collapse: collapse;
 }
 
-thead {
-  background: #f5f5f5;
-}
-
-th, td {
-  padding: 10px;
-  text-align: left;
-  border-bottom: 1px solid #ddd;
-  font-size: 14px;
+thead tr {
+  border-bottom: 2px solid #2d2f4a;
 }
 
 th {
-  font-size: 12px;
-  color: #888;
+  padding: 10px 12px;
+  text-align: left;
+  font-size: 11px;
+  font-weight: 600;
+  letter-spacing: 0.7px;
   text-transform: uppercase;
+  color: #4b5280;
+}
+
+td {
+  padding: 13px 12px;
+  font-size: 14px;
+  color: #c4c9d8;
+  border-bottom: 1px solid #22253a;
+}
+
+tbody tr:last-child td {
+  border-bottom: none;
+}
+
+tbody tr:hover {
+  background: #1e2138;
+}
+
+td.income-amount,
+td.expense-amount {
+  font-size: 14px;
+  font-weight: 600;
 }
 
 .delete-btn {
-  padding: 4px 10px;
-  background: #eee;
-  border: 1px solid #ccc;
+  padding: 5px 12px;
+  background: transparent;
+  border: 1.5px solid #fca5a5;
+  border-radius: 6px;
   cursor: pointer;
   font-size: 12px;
-  color: #333;
+  font-weight: 500;
+  color: #ef4444;
+  transition: background 0.15s, color 0.15s;
+}
+
+.delete-btn:hover {
+  background: #ef4444;
+  color: #fff;
+  border-color: #ef4444;
 }
