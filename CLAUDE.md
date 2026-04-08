@@ -4,6 +4,8 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 
 ## Commands
 
+Run from the `frontend/` directory:
+
 ```bash
 npm run dev      # Start dev server at http://localhost:5173
 npm run build    # Production build
@@ -15,7 +17,7 @@ There is no test suite configured.
 
 ## Architecture
 
-React + Vite app. No routing, no external state management, no backend.
+React + Vite app. No routing, no external state management. Frontend lives in `frontend/`, backend in `backend/`.
 
 **Component tree:**
 
@@ -24,7 +26,7 @@ React + Vite app. No routing, no external state management, no backend.
   - `TransactionForm` — owns its own form state; calls `onAdd(transaction)` prop on submit.
   - `TransactionList` — receives `transactions`, owns filter state (`filterType`, `filterCategory`) internally.
 
-All styling is in `src/App.css`. Categories are a shared fixed list defined locally in `TransactionForm` and `TransactionList`.
+All styling is in `frontend/src/App.css`. Categories are a shared fixed list defined locally in `TransactionForm` and `TransactionList`.
 
 **Data shape:**
 
