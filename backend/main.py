@@ -2,9 +2,15 @@ from contextlib import asynccontextmanager
 from typing import Optional
 from fastapi import FastAPI, Depends, HTTPException
 from fastapi.middleware.cors import CORSMiddleware
+from fastapi.security import OAuth2PasswordRequestForm
 from sqlmodel import SQLModel, Field, Session, select
 
 from database import create_db_and_tables, get_session
+from auth import (
+    User, UserCreate, Token,
+    hash_password, verify_password, create_access_token,
+    get_current_user,
+)
 
 
 # ── Model ─────────────────────────────────────────────────────────────────────
@@ -66,13 +72,42 @@ app.add_middleware(
 
 # ── Routes ─────────────────────────────────────────────────────────────────────
 
+# ── Auth routes ────────────────────────────────────────────────────────────────
+
+@app.post("/api/auth/register", response_model=Token, status_code=201)
+def register(body: UserCreate, session: Session = Depends(get_session)):
+    if session.exec(select(User).where(User.email == body.email)).first():
+        raise HTTPException(status_code=409, detail="Email already registered")
+    user = User(email=body.email, hashed_password=hash_password(body.password))
+    session.add(user)
+    session.commit()
+    return Token(access_token=create_access_token(user.email))
+
+
+@app.post("/api/auth/login", response_model=Token)
+def login(form: OAuth2PasswordRequestForm = Depends(), session: Session = Depends(get_session)):
+    user = session.exec(select(User).where(User.email == form.username)).first()
+    if not user or not verify_password(form.password, user.hashed_password):
+        raise HTTPException(status_code=401, detail="Incorrect email or password")
+    return Token(access_token=create_access_token(user.email))
+
+
+# ── Transaction routes ─────────────────────────────────────────────────────────
+
 @app.get("/api/transactions", response_model=list[Transaction])
-def list_transactions(session: Session = Depends(get_session)):
+def list_transactions(
+    session: Session = Depends(get_session),
+    _: User = Depends(get_current_user),
+):
     return session.exec(select(Transaction)).all()
 
 
 @app.post("/api/transactions", response_model=Transaction, status_code=201)
-def create_transaction(body: TransactionCreate, session: Session = Depends(get_session)):
+def create_transaction(
+    body: TransactionCreate,
+    session: Session = Depends(get_session),
+    _: User = Depends(get_current_user),
+):
     transaction = Transaction(**body.model_dump())
     session.add(transaction)
     session.commit()
@@ -81,7 +116,11 @@ def create_transaction(body: TransactionCreate, session: Session = Depends(get_s
 
 
 @app.delete("/api/transactions/{transaction_id}", status_code=204)
-def delete_transaction(transaction_id: int, session: Session = Depends(get_session)):
+def delete_transaction(
+    transaction_id: int,
+    session: Session = Depends(get_session),
+    _: User = Depends(get_current_user),
+):
     transaction = session.get(Transaction, transaction_id)
     if not transaction:
         raise HTTPException(status_code=404, detail="Transaction not found")

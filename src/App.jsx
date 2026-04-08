@@ -3,56 +3,89 @@ import './App.css'
 import Summary from './Summary'
 import TransactionForm from './TransactionForm'
 import TransactionList from './TransactionList'
+import AuthForm from './AuthForm'
 
 function App() {
-  const [transactions, setTransactions] = useState([]);
-  const [loading, setLoading] = useState(true);
+  const [token, setToken] = useState(() => localStorage.getItem('token'))
+  const [transactions, setTransactions] = useState([])
+  const [loading, setLoading] = useState(true)
+
+  const authHeaders = {
+    'Authorization': `Bearer ${token}`,
+    'Content-Type': 'application/json',
+  }
 
   const fetchTransactions = () => {
-    fetch('/api/transactions')
-      .then(res => res.json())
+    fetch('/api/transactions', { headers: authHeaders })
+      .then(res => {
+        if (res.status === 401) { handleLogout(); return null }
+        return res.json()
+      })
       .then(data => {
-        setTransactions(data);
-        setLoading(false);
-      });
-  };
+        if (data) setTransactions(data)
+        setLoading(false)
+      })
+  }
 
   useEffect(() => {
-    fetchTransactions();
-  }, []);
+    if (token) fetchTransactions()
+  }, [token])
+
+  const handleAuth = (newToken) => {
+    localStorage.setItem('token', newToken)
+    setToken(newToken)
+    setLoading(true)
+  }
+
+  const handleLogout = () => {
+    localStorage.removeItem('token')
+    setToken(null)
+    setTransactions([])
+  }
 
   const handleAdd = (transaction) => {
     fetch('/api/transactions', {
       method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
+      headers: authHeaders,
       body: JSON.stringify(transaction),
-    }).then(() => fetchTransactions());
-  };
+    }).then(() => fetchTransactions())
+  }
 
   const handleDelete = (id) => {
-    fetch(`/api/transactions/${id}`, { method: 'DELETE' })
-      .then(() => fetchTransactions());
-  };
+    fetch(`/api/transactions/${id}`, {
+      method: 'DELETE',
+      headers: authHeaders,
+    }).then(() => fetchTransactions())
+  }
+
+  if (!token) {
+    return <AuthForm onAuth={handleAuth} />
+  }
 
   if (loading) {
     return (
       <div className="app">
         <h1>Finance Tracker</h1>
-        <p className="subtitle">Loading...</p>
+        <p className="subtitle">Loading…</p>
       </div>
-    );
+    )
   }
 
   return (
     <div className="app">
-      <h1>Finance Tracker</h1>
-      <p className="subtitle">Track your income and expenses</p>
+      <div className="app-header">
+        <div>
+          <h1>Finance Tracker</h1>
+          <p className="subtitle">Track your income and expenses</p>
+        </div>
+        <button className="logout-btn" onClick={handleLogout}>Logout</button>
+      </div>
 
       <Summary transactions={transactions} />
       <TransactionForm onAdd={handleAdd} />
       <TransactionList transactions={transactions} onDelete={handleDelete} />
     </div>
-  );
+  )
 }
 
 export default App

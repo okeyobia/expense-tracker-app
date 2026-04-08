@@ -8,4 +8,7 @@ dependencies = [
     "sqlmodel",
     "psycopg2-binary",
     "python-dotenv",
+    "python-jose[cryptography]",
+    "passlib[argon2]",
+    "python-multipart",
 ]
